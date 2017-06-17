@@ -10,7 +10,7 @@ class User(models.Model):
     user_key = models.CharField(max_length=100)
     last_visit = models.DateField(auto_now_add=True, blank=True)
     active = models.BooleanField(default=True)
-    campus = models.CharField(null=True, choices=CAMPUS_LIST)
+    campus = models.CharField(null=True, max_length=10, choices=CAMPUS_LIST)
 
 class Chat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
