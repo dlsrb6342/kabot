@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def get_gongsik():
     result = {}
-    response = requests.get('http://www.skku.edu/new_home/campus/support/pop_menu1.jsp?restId=203&startDate=20170614')
+    response = requests.get('http://www.skku.edu/new_home/campus/support/pop_menu1.jsp?restId=203')
     soup = BeautifulSoup(response.text, 'html5lib')
     notice_list = soup.find_all('p', class_='c_blue')
     if len(notice_list) == 0:
