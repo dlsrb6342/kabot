@@ -12,7 +12,7 @@ class HomeKeyboard(APIView):
     def get(self, request):
         home_keyboard = {
             "type" : "buttons",
-            "buttons" : ["캠퍼스 설정하기", "공지사항", ""]
+            "buttons" : ["캠퍼스 설정하기", "대화 시작하기"]
         }
         return Response(home_keyboard)
 
@@ -47,16 +47,18 @@ class Message(APIView):
     def post(self, request):
         user_key = request.data.get('user_key')
         content = request.data.get('content')
-        user = User.objects.get(user_key=user_key)
+        if content == "대화 시작하기":
+            return Response(dict(message=dict(text="학사일정이나 공식 메뉴를 물어봐주세요!")))
+        user, created = User.objects.get_or_create(user_key=user_key)
         chat = Chat.objects.create(user=user, content=content)
         chat.save()
         category = cache.get(user_key)
         if category is None:
             category = extract_category(user_key, content)
             if category is None:
-                return ERROR_MESSAGE
+                return Response(ERROR_MESSAGE)
 
         flag, keyword = extract_keyword(category, content)
         if not flag:
-            return keyword
-        return make_message(user_key, keyword)
+            return Response(keyword)
+        return Response(make_message(user_key, keyword))

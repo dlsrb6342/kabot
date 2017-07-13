@@ -20,7 +20,7 @@ def make_message(user_key, keyword):
 def gongsik(keyword):
     menu = get_gongsik()
     if menu is None:
-        return dict(message=dict(text="오늘은 쉬는 날인가봐요! 메뉴 정보가 없네요ㅠㅠ"))
+        return "오늘은 쉬는 날인가봐요! 메뉴 정보가 없네요ㅠㅠ"
     temp = ["아침", "점심", "저녁"]
     time = ["조식", "중식", "석식"]
 

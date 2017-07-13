@@ -25,11 +25,14 @@ class Chat(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    arguments = ArrayField(JSONField(default={
-        "type": "",
-        "option": False,
-        "error": ""
-    }))
+    count = models.IntegerField(default=0)
+
+
+class Argument(models.Model):
+    type = models.CharField(max_length=100)
+    option = models.BooleanField(default=False)
+    error = models.CharField(max_length=100)
+    category = models.ManyToManyField(Category)
 
 
 class Keyword(models.Model):
