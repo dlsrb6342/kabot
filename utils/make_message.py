@@ -10,8 +10,9 @@ def make_message(user_key, keyword):
 
     if category.name == "공식":
         message['message']['text'] = gongsik(keyword)
-    else:
+    elif category.name == "일정" or category.name == "언제":
         message['message']['text'] = schedule(keyword)
+
     if message['message']['text'] == "":
         return ERROR_MESSAGE
     return message
@@ -39,15 +40,15 @@ def gongsik(keyword):
 
 
 def schedule(keyword):
-    # TODO how to serve schedule
     schedule_list = get_schedule()
     answer = ""
     answer_dic = {}
     first = False
-    for schedule in schedule_list:
-        if keyword in schedule[0] and not schedule[1] in answer_dic:
-            if first:
-                answer += "\r\n\r\n"
-            first = True
-            answer_dic[schedule[1]] = schedule[0]
-            answer += schedule[0] + "  -  " + schedule[1]
+    for k in keyword:
+        for schedule in schedule_list:
+            if k in schedule[0] and not schedule[1] in answer_dic:
+                if first:
+                    answer += "\r\n\r\n"
+                first = True
+                answer_dic[schedule[1]] = schedule[0]
+                answer += schedule[0] + "  -  " + schedule[1]

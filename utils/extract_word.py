@@ -26,9 +26,13 @@ def extract_keyword(category, content):
     required_type = set(a.type for a in arguments if not a.option)
     mecab = Mecab()
     nouns_set = set(mecab.nouns(content))
+    error = ['수강신청', '강의평가']
+    for e in error:
+        if e in content:
+            nouns_set.add(e)
     keyword = keywords_name & nouns_set
 
-    keyword_type = set(k for k in Keyword.objects.filter(name__in=keyword).values_list('type', flat=True))
+    keyword_type = set(k for k in keywords.filter(name__in=keyword).values_list('type', flat=True))
 
     if len(required_type - keyword_type) != 0:
         return False, {
