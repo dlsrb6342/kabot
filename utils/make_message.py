@@ -41,6 +41,12 @@ def gongsik(keyword):
 
 def schedule(keyword):
     schedule_list = get_schedule()
+    temp = ["중간고사", "기말고사", "복전"]
+    test = ["중간시험", "기말시험", "복수전공"]
+    for i in range(3):
+        if temp[i] in keyword:
+            keyword.remove(temp[i])
+            keyword.append(test[i])
     answer = ""
     answer_dic = {}
     first = False
@@ -52,3 +58,4 @@ def schedule(keyword):
                 first = True
                 answer_dic[schedule[1]] = schedule[0]
                 answer += schedule[0] + "  -  " + schedule[1]
+    return answer
