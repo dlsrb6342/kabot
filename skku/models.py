@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField, ArrayField
 
 
 ERROR_MESSAGE = dict(message=dict(text="무슨 말씀이신 건가요? 다시 입력해주세요ㅠ"))
@@ -7,8 +6,8 @@ ERROR_MESSAGE = dict(message=dict(text="무슨 말씀이신 건가요? 다시 �
 
 class User(models.Model):
     CAMPUS_LIST = (
-        ('M', '인문사회과학캠퍼스'),
-        ('Y', '자연과학캠퍼스')
+        ('인문사회과학캠퍼스', '인문사회과학캠퍼스'),
+        ('자연과학캠퍼스', '자연과학캠퍼스')
     )
 
     user_key = models.CharField(max_length=100)

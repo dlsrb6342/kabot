@@ -19,14 +19,13 @@ class HomeKeyboard(APIView):
 
 class Exit(APIView):
     
-    def delete(self, request):
-        user_key = request.data.get('user_key')
+    def delete(self, request, user_key):
         user = User.objects.get(user_key=user_key)
         user.last_visit = datetime.now()
         user.save()
 
 
-class Friend(APIView):
+class FriendAdd(APIView):
     
     def post(self, request):
         user_key = request.data.get('user_key')
@@ -35,8 +34,10 @@ class Friend(APIView):
             user.active = True
         user.save()
 
-    def delete(self, request):
-        user_key = request.data.get('user_key')
+
+class FriendDelete(APIView):
+
+    def delete(self, request, user_key):
         user = User.objects.get(user_key=user_key)
         user.active = False
         user.save()
@@ -47,9 +48,43 @@ class Message(APIView):
     def post(self, request):
         user_key = request.data.get('user_key')
         content = request.data.get('content')
-        if content == "대화 시작하기":
-            return Response(dict(message=dict(text="학사일정이나 공식 메뉴를 물어봐주세요!")))
+        campus_list = [ "인문사회과학캠퍼스", "자연과학캠퍼스" ]
         user, created = User.objects.get_or_create(user_key=user_key)
+        last_visit = user.last_visit
+        user.last_visit = datetime.now()
+        if content == "캠퍼스 설정하기":
+            cache.set(user_key, "campus")
+            return Response({
+                'message': {
+                    'text': "캠퍼스를 선택해주세요!"
+                }, 'keyboard': {
+                    'type': "buttons",
+                    'buttons': campus_list
+                }
+            })
+        elif content in campus_list and cache.get(user_key) == "campus":
+            user.campus = content
+            user.save()
+            cache.delete(user_key)
+            return Response({
+                'message': {
+                    'text': content + "로 설정되었어요!"
+                }, 'keyboard': {
+                    "type" : "buttons",
+                    "buttons" : ["캠퍼스 설정하기", "대화 시작하기"]
+                }
+            })
+        elif content == "대화 시작하기":
+            now = datetime.now()
+            diff = now.day - last_visit.day
+            text = "학사일정이나 공식 메뉴를 물어봐주세요!\n예시 : '점심 공식 메뉴 뭐야?'\n'등록금 납부 언제야?'"
+            if diff >= 4:
+                text = str(diff) + "일만에 다시 오셨네요ㅎㅎ\r\n" + text
+            return Response({
+                "message": {
+                    "text": text
+                }
+            })
         chat = Chat.objects.create(user=user, content=content)
         chat.save()
         category = cache.get(user_key)
