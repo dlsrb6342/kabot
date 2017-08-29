@@ -8,8 +8,8 @@ def make_message(user_key, keyword):
     cache.delete(user_key)
     message = dict(message=dict(text=""))
 
-    if category.name == "공식":
-        message['message']['text'] = gongsik(keyword)
+    if category.name == "공식" or category.name == "긱식":
+        message['message']['text'] = meal(keyword, category.name)
     elif category.name == "일정" or category.name == "언제":
         message['message']['text'] = schedule(keyword)
 
@@ -18,8 +18,11 @@ def make_message(user_key, keyword):
     return message
 
 
-def gongsik(keyword):
-    menu = get_gongsik()
+def meal(keyword, name):
+    if name == "공식":
+        menu = get_gongsik()
+    elif name == "긱식":
+        menu = get_giksik()
     if menu is None:
         return "오늘은 쉬는 날인가봐요! 메뉴 정보가 없네요ㅠㅠ"
     temp = ["아침", "점심", "저녁"]
