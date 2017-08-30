@@ -4,11 +4,11 @@ from utils.get_schedule import get_schedule
 from django.core.cache import cache
 
 def make_message(user_key, keyword):
-    category = cache.get(user_key)
-    cache.delete(user_key)
+    category = cache.get(user_key + '_category')
+    cache.delete(user_key + '_category')
     message = dict(message=dict(text=""))
 
-    if category.name == "공식" or category.name == "긱식":
+    if category.name == "공식" or category.name == "긱식" or category.name == "긱밥":
         message['message']['text'] = meal(keyword, category.name)
     elif category.name == "일정" or category.name == "언제":
         message['message']['text'] = schedule(keyword)
@@ -19,10 +19,11 @@ def make_message(user_key, keyword):
 
 
 def meal(keyword, name):
+    tomorrow = '내일' in keyword
     if name == "공식":
-        menu = get_gongsik()
-    elif name == "긱식":
-        menu = get_giksik()
+        menu = get_gongsik(tomorrow)
+    elif name == "긱식" or name == "긱밥":
+        menu = get_giksik(tomorrow)
     if menu is None:
         return "오늘은 쉬는 날인가봐요! 메뉴 정보가 없네요ㅠㅠ"
     temp = ["아침", "점심", "저녁"]
@@ -36,7 +37,7 @@ def meal(keyword, name):
     answer = ""
     for t in time:
         if t in keyword:
-            answer += "\r\n" + t +"\n"
+            answer += t +"\n"
             for m in menu[t]:
                 answer += m + "\n"
     return answer

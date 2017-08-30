@@ -14,11 +14,11 @@ def extract_category(user_key, content):
     category = Category.objects.get(name=category_name[0])
     category.count = category.count + 1
     category.save()
-    cache.set(user_key, category)
+    cache.set(user_key + '_category', category)
     return category
 
 
-def extract_keyword(category, content):
+def extract_keyword(category, content, user_key):
     keywords = Keyword.objects.all()
     keywords_name = set(k for k in keywords.values_list('name', flat=True))
 
@@ -31,14 +31,19 @@ def extract_keyword(category, content):
         if e in content:
             nouns_set.add(e)
     keyword = keywords_name & nouns_set
-
+    past_keyword = cache.get(user_key + '_keyword')
+    if not past_keyword is None:
+        keyword = keyword.union(past_keyword)
+    
     keyword_type = set(k for k in keywords.filter(name__in=keyword).values_list('type', flat=True))
-
+    
     if len(required_type - keyword_type) != 0:
+        cache.set(user_key + '_keyword', keyword)
         return False, {
             "message": {
                 "text": arguments.filter(type=(required_type - keyword_type).pop()).get().error
             }
         }
 
+    cache.delete(user_key + '_keyword')
     return True, list(keyword)

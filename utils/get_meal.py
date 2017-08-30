@@ -1,11 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
-def get_gongsik():
+def get_gongsik(tomorrow):
     result = {}
-    response = requests.get('http://www.skku.edu/new_home/campus/support/pop_menu1.jsp?restId=203')
+    date = datetime.today() + timedelta(days=1) if tomorrow else datetime.today()
+    response = requests.get('http://www.skku.edu/new_home/campus/support/pop_menu1.jsp?restId=203' 
+                            + '&startDate=' + date.strftime('%Y%m%d'))
     soup = BeautifulSoup(response.text, 'html5lib')
     notice_list = soup.find_all('p', class_='c_blue')
     if len(notice_list) == 0:
@@ -29,10 +31,11 @@ def get_gongsik():
                 meal_list.append(next_element.text)
 
 
-def get_giksik():
-    day = str(datetime.today().day)
-    month = str(datetime.today().month)
-    year = str(datetime.today().year)
+def get_giksik(tomorrow):
+    date = datetime.today() + timedelta(days=1) if tomorrow else datetime.today()
+    day = str(date.day)
+    month = str(date.month)
+    year = str(date.year)
     result = {}
     response = requests.get('https://dorm.skku.edu/_custom/skku/_common/board/schedule_menu/food_menu_page.jsp?day=' +
                             day + '&month=' + month + '&year=' + year + '&board_no=61')
